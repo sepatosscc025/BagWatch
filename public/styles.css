@@ -1,0 +1,1167 @@
+/* ============================================================
+   BAGWATCH — styles.css
+   All visual styling for the BagWatch app.
+
+   TABLE OF CONTENTS:
+   1.  CSS Variables (colours, fonts)
+   2.  Reset & Base
+   3.  Screens & Transitions
+   4.  Auth Screens (Sign In / Sign Up)
+   5.  Splash Screen
+   6.  App Header
+   7.  Bottom Navigation
+   8.  Content Wrapper
+   9.  Home — Status Banner
+   10. Home — Bag Cards
+   11. Home — Community / Radar
+   12. Alert Cards
+   13. Report Form
+   14. Settings
+   15. Modal
+   16. Device Pairing / Scanning
+   ============================================================ */
+
+
+/* ----------------------------------------------------------
+   1. CSS VARIABLES
+   ---------------------------------------------------------- */
+:root {
+  --bg:           #0e0f11;
+  --surface:      #16181c;
+  --surface2:     #1e2026;
+  --border:       #2a2d35;
+  --orange:       #f97316;
+  --orange-dim:   #c45d10;
+  --orange-glow:  rgba(249, 115, 22, 0.15);
+  --green:        #22c55e;
+  --red:          #ef4444;
+  --yellow:       #eab308;
+  --text:         #f0f0f0;
+  --muted:        #7a7f8e;
+  --font-display: 'Barlow Condensed', sans-serif;
+  --font-body:    'Barlow', sans-serif;
+}
+
+
+/* ----------------------------------------------------------
+   2. RESET & BASE
+   ---------------------------------------------------------- */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* Subtle noise texture overlay */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.4;
+}
+
+
+/* ----------------------------------------------------------
+   3. SCREENS & TRANSITIONS
+   ---------------------------------------------------------- */
+.screen {
+  position: fixed;
+  inset: 0;
+  min-height: 100vh;
+  overflow-y: auto;
+  z-index: 1;
+  /* Start hidden — slid off to the right */
+  transform: translateX(100%);
+  opacity: 0;
+  pointer-events: none;
+  transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1),
+              opacity   0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* The currently visible screen */
+.screen.active {
+  transform: translateX(0);
+  opacity: 1;
+  pointer-events: all;
+}
+
+/* Screen that is sliding OUT (going back) */
+.screen.slide-out {
+  transform: translateX(-60px);
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* Splash screen exits downward instead of to the left */
+#splash.slide-out {
+  transform: translateY(40px);
+  opacity: 0;
+  pointer-events: none;
+}
+
+
+/* ----------------------------------------------------------
+   4. AUTH DRAWERS (Sign In / Sign Up)
+   Slide-up modals that appear over the splash screen.
+   ---------------------------------------------------------- */
+
+/* Dark overlay behind the drawer */
+.auth-drawer-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(6px);
+  z-index: 300;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+.auth-drawer-overlay.open {
+  opacity: 1;
+  pointer-events: all;
+}
+
+/* The white/dark drawer panel itself */
+.auth-drawer {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 24px 24px 0 0;
+  padding: 1rem 1.5rem 2rem;
+  width: 100%;
+  max-width: 480px;
+  transform: translateY(100%);
+  transition: transform 0.35s cubic-bezier(0.32, 0.72, 0, 1);
+}
+.auth-drawer-overlay.open .auth-drawer {
+  transform: translateY(0);
+}
+
+/* Drag handle at the top */
+.drawer-handle {
+  width: 40px;
+  height: 4px;
+  background: var(--border);
+  border-radius: 2px;
+  margin: 0 auto 1.25rem;
+}
+
+/* Header row: title + close button */
+.drawer-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.35rem;
+}
+.drawer-title {
+  font-family: var(--font-display);
+  font-size: 1.6rem;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+}
+.drawer-close {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s;
+  flex-shrink: 0;
+}
+.drawer-close:hover { background: var(--orange-glow); border-color: var(--orange); }
+.drawer-close svg   { width: 14px; height: 14px; stroke: var(--muted); }
+.drawer-close:hover svg { stroke: var(--orange); }
+
+.drawer-sub {
+  font-size: 0.85rem;
+  color: var(--muted);
+  margin-bottom: 1.25rem;
+  line-height: 1.5;
+}
+
+/* Keep old #signin and #signup screen styles removed */
+#signin, #signup { display: none !important; }
+
+/* Input fields with left icon */
+.input-wrap { position: relative; }
+
+.input-wrap .input-icon {
+  position: absolute;
+  left: 0.9rem;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 18px;
+  height: 18px;
+  stroke: var(--muted);
+  pointer-events: none;
+}
+
+.input-wrap input {
+  width: 100%;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 0.85rem 1rem 0.85rem 2.75rem;
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 0.95rem;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+.input-wrap input:focus {
+  border-color: var(--orange);
+  box-shadow: 0 0 0 3px rgba(249,115,22,0.12);
+}
+.input-wrap input::placeholder { color: var(--muted); }
+
+/* Show/hide password eye button */
+.input-eye {
+  position: absolute;
+  right: 0.9rem;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  display: flex;
+  align-items: center;
+}
+.input-eye svg        { width: 18px; height: 18px; stroke: var(--muted); transition: stroke 0.2s; }
+.input-eye:hover svg  { stroke: var(--orange); }
+
+.auth-forgot {
+  text-align: right;
+  margin-top: -0.25rem;
+  font-size: 0.8rem;
+  color: var(--orange);
+  cursor: pointer;
+  background: none;
+  border: none;
+  font-family: var(--font-body);
+}
+.auth-forgot:hover { text-decoration: underline; }
+
+/* Inline error message */
+.auth-error {
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  border-radius: 8px;
+  padding: 0.65rem 1rem;
+  font-size: 0.82rem;
+  color: var(--red);
+  display: none;
+}
+.auth-error.show { display: block; }
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0);    }
+  20%       { transform: translateX(-6px); }
+  40%       { transform: translateX(6px);  }
+  60%       { transform: translateX(-4px); }
+  80%       { transform: translateX(4px);  }
+}
+
+/* "— or —" divider */
+.auth-divider {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin: 0.25rem 0;
+  color: var(--muted);
+  font-size: 0.75rem;
+}
+.auth-divider::before,
+.auth-divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--border);
+}
+
+.auth-switch {
+  text-align: center;
+  font-size: 0.83rem;
+  color: var(--muted);
+  margin-top: 1.25rem;
+}
+.auth-switch button {
+  background: none;
+  border: none;
+  color: var(--orange);
+  font-family: var(--font-body);
+  font-size: 0.83rem;
+  cursor: pointer;
+  font-weight: 600;
+}
+.auth-switch button:hover { text-decoration: underline; }
+
+
+/* ----------------------------------------------------------
+   5. SPLASH SCREEN
+   ---------------------------------------------------------- */
+#splash {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  background: radial-gradient(ellipse at 50% 40%, rgba(249,115,22,0.12) 0%, transparent 65%);
+  text-align: center;
+  padding: 2rem;
+}
+
+.logo-mark {
+  width: 80px;
+  height: 80px;
+  border: 3px solid var(--orange);
+  border-radius: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 1.5rem;
+  position: relative;
+  box-shadow: 0 0 40px rgba(249,115,22,0.3), inset 0 0 20px rgba(249,115,22,0.05);
+  animation: pulse 2s ease-in-out infinite;
+}
+@keyframes pulse {
+  0%, 100% { box-shadow: 0 0 40px rgba(249,115,22,0.3), inset 0 0 20px rgba(249,115,22,0.05); }
+  50%       { box-shadow: 0 0 60px rgba(249,115,22,0.5), inset 0 0 20px rgba(249,115,22,0.08); }
+}
+.logo-mark svg { width: 44px; height: 44px; }
+
+.brand {
+  font-family: var(--font-display);
+  font-size: 3.5rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  line-height: 1;
+  margin-bottom: 0.5rem;
+}
+.brand span { color: var(--orange); }
+
+.tagline {
+  font-size: 1rem;
+  color: var(--muted);
+  font-weight: 400;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  margin-bottom: 3rem;
+}
+
+.splash-cta {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  width: 100%;
+  max-width: 320px;
+}
+
+.splash-note {
+  margin-top: 2.5rem;
+  font-size: 0.75rem;
+  color: var(--muted);
+  max-width: 260px;
+  line-height: 1.6;
+}
+
+
+/* ----------------------------------------------------------
+   6. SHARED BUTTONS
+   ---------------------------------------------------------- */
+.btn {
+  padding: 0.9rem 2rem;
+  border-radius: 8px;
+  font-family: var(--font-display);
+  font-size: 1.1rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  cursor: pointer;
+  border: none;
+  transition: all 0.2s ease;
+  text-transform: uppercase;
+}
+.btn-primary {
+  background: var(--orange);
+  color: #fff;
+}
+.btn-primary:hover {
+  background: #ea6a0a;
+  transform: translateY(-1px);
+  box-shadow: 0 8px 24px rgba(249,115,22,0.35);
+}
+.btn-secondary {
+  background: transparent;
+  color: var(--text);
+  border: 1.5px solid var(--border);
+}
+.btn-secondary:hover {
+  border-color: var(--orange);
+  color: var(--orange);
+}
+
+.btn-sm {
+  padding: 0.45rem 0.9rem;
+  border-radius: 6px;
+  font-family: var(--font-display);
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  cursor: pointer;
+  border: none;
+  text-transform: uppercase;
+  transition: all 0.2s;
+}
+.btn-sm-primary             { background: var(--orange); color: #fff; }
+.btn-sm-primary:hover       { background: #ea6a0a; }
+.btn-sm-ghost               { background: var(--surface2); color: var(--muted); border: 1px solid var(--border); }
+.btn-sm-ghost:hover         { color: var(--text); border-color: var(--muted); }
+
+
+/* ----------------------------------------------------------
+   7. APP HEADER
+   ---------------------------------------------------------- */
+.app-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 1.25rem;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.header-brand {
+  font-family: var(--font-display);
+  font-size: 1.6rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+}
+.header-brand span { color: var(--orange); }
+
+.header-right { display: flex; gap: 0.75rem; align-items: center; }
+
+.icon-btn {
+  width: 38px;
+  height: 38px;
+  border-radius: 8px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.icon-btn:hover              { border-color: var(--orange); background: var(--orange-glow); }
+.icon-btn svg                { width: 18px; height: 18px; stroke: var(--muted); }
+.icon-btn:hover svg          { stroke: var(--orange); }
+
+
+/* ----------------------------------------------------------
+   8. BOTTOM NAVIGATION
+   ---------------------------------------------------------- */
+.bottom-nav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: var(--surface);
+  border-top: 1px solid var(--border);
+  display: flex;
+  z-index: 100;
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+.nav-item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 0.75rem 0.5rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  gap: 0.25rem;
+  border: none;
+  background: none;
+}
+.nav-item svg           { width: 22px; height: 22px; stroke: var(--muted); transition: stroke 0.2s; }
+.nav-label              { font-size: 0.65rem; color: var(--muted); font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase; transition: color 0.2s; }
+.nav-item.active svg    { stroke: var(--orange); }
+.nav-item.active .nav-label { color: var(--orange); }
+
+
+/* ----------------------------------------------------------
+   9. CONTENT WRAPPER & PAGE TITLES
+   ---------------------------------------------------------- */
+.content {
+  padding: 1.25rem;
+  padding-bottom: 90px;
+}
+
+.section-label {
+  font-family: var(--font-display);
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 0.75rem;
+}
+
+.page-title {
+  font-family: var(--font-display);
+  font-size: 2rem;
+  font-weight: 800;
+  letter-spacing: 0.03em;
+  margin-bottom: 0.25rem;
+}
+.page-subtitle {
+  font-size: 0.8rem;
+  color: var(--muted);
+  margin-bottom: 1.5rem;
+}
+
+
+/* ----------------------------------------------------------
+   10. HOME — STATUS BANNER
+   ---------------------------------------------------------- */
+.status-banner {
+  background: linear-gradient(135deg, var(--surface) 0%, var(--surface2) 100%);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 1rem 1.25rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+  position: relative;
+  overflow: hidden;
+}
+.status-banner::before {
+  content: '';
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  width: 4px;
+  background: var(--green);
+  border-radius: 4px 0 0 4px;
+}
+.status-banner.alert::before { background: var(--red); }
+
+.status-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--green);
+  box-shadow: 0 0 8px var(--green);
+  flex-shrink: 0;
+  animation: blink 1.5s ease-in-out infinite;
+}
+.status-dot.red { background: var(--red); box-shadow: 0 0 8px var(--red); }
+
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.4; }
+}
+
+.status-text  { flex: 1; }
+.status-title { font-weight: 600; font-size: 0.9rem; }
+.status-sub   { font-size: 0.75rem; color: var(--muted); margin-top: 0.15rem; }
+
+
+/* ----------------------------------------------------------
+   11. HOME — BAG CARDS
+   ---------------------------------------------------------- */
+.bags-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-bottom: 1.5rem;
+}
+
+.bag-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 1rem 1.25rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  cursor: pointer;
+  transition: all 0.25s;
+  position: relative;
+  overflow: hidden;
+}
+.bag-card:hover {
+  border-color: var(--orange);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+}
+.bag-card.connected::after {
+  content: '';
+  position: absolute;
+  top: 0; right: 0;
+  width: 60px; height: 60px;
+  background: radial-gradient(circle at top right, rgba(34,197,94,0.12), transparent 70%);
+}
+.bag-card.lost::after {
+  background: radial-gradient(circle at top right, rgba(239,68,68,0.12), transparent 70%);
+}
+
+.bag-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 10px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  font-size: 1.4rem;
+}
+
+.bag-info   { flex: 1; }
+.bag-name   { font-weight: 600; font-size: 0.95rem; margin-bottom: 0.2rem; }
+.bag-meta   { font-size: 0.75rem; color: var(--muted); }
+
+.bag-status {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.3rem;
+}
+
+.status-pill {
+  padding: 0.2rem 0.6rem;
+  border-radius: 20px;
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+.pill-connected { background: rgba(34,197,94,0.15);  color: var(--green);  }
+.pill-lost      { background: rgba(239,68,68,0.15);  color: var(--red);    }
+.pill-away      { background: rgba(234,179,8,0.15);  color: var(--yellow); }
+
+.bag-distance { font-size: 0.7rem; color: var(--muted); }
+
+.add-bag-btn {
+  border: 1.5px dashed var(--border);
+  border-radius: 12px;
+  padding: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  color: var(--muted);
+  font-family: var(--font-display);
+  font-size: 0.9rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  background: none;
+  width: 100%;
+  transition: all 0.2s;
+}
+.add-bag-btn:hover {
+  border-color: var(--orange);
+  color: var(--orange);
+  background: var(--orange-glow);
+}
+.add-bag-btn svg { width: 18px; height: 18px; stroke: currentColor; }
+
+
+/* ----------------------------------------------------------
+   12. HOME — COMMUNITY / RADAR
+   ---------------------------------------------------------- */
+.community-box {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 1.25rem;
+  margin-bottom: 1.5rem;
+}
+.community-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+.community-title {
+  font-family: var(--font-display);
+  font-size: 1rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+.community-count {
+  font-family: var(--font-display);
+  font-size: 1.8rem;
+  font-weight: 800;
+  color: var(--orange);
+}
+.community-sub { font-size: 0.75rem; color: var(--muted); }
+
+/* Radar animation */
+.radar {
+  width: 100%;
+  max-width: 200px;
+  height: 120px;
+  margin: 0.75rem auto;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.radar-ring {
+  position: absolute;
+  border-radius: 50%;
+  border: 1px solid var(--border);
+}
+.radar-ring:nth-child(1) { width: 100%; height: 100%; }
+.radar-ring:nth-child(2) { width: 66%; height: 66%; border-color: rgba(249,115,22,0.2); }
+.radar-ring:nth-child(3) { width: 33%; height: 33%; border-color: rgba(249,115,22,0.4); }
+
+.radar-center {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--orange);
+  box-shadow: 0 0 10px var(--orange);
+}
+.radar-dot {
+  position: absolute;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--green);
+  box-shadow: 0 0 6px var(--green);
+}
+.radar-sweep {
+  position: absolute;
+  width: 50%;
+  height: 50%;
+  top: 0;
+  left: 50%;
+  transform-origin: bottom left;
+  background: conic-gradient(from 0deg, transparent 85%, rgba(249,115,22,0.3) 100%);
+  animation: sweep 3s linear infinite;
+  border-radius: 0 100% 0 0;
+}
+@keyframes sweep {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
+
+/* ----------------------------------------------------------
+   13. ALERT CARDS
+   ---------------------------------------------------------- */
+.alert-card {
+  background: var(--surface);
+  border: 1px solid rgba(239,68,68,0.3);
+  border-radius: 12px;
+  padding: 1.25rem;
+  margin-bottom: 0.75rem;
+  position: relative;
+  overflow: hidden;
+}
+.alert-card::before {
+  content: '';
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  width: 4px;
+  background: var(--red);
+}
+.alert-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 0.75rem;
+}
+.alert-title { font-weight: 600; font-size: 0.9rem; }
+.alert-time  { font-size: 0.7rem; color: var(--muted); }
+.alert-body  { font-size: 0.8rem; color: var(--muted); line-height: 1.5; margin-bottom: 0.75rem; }
+.alert-actions { display: flex; gap: 0.5rem; }
+
+
+/* ----------------------------------------------------------
+   14. REPORT FORM
+   ---------------------------------------------------------- */
+.form-group   { margin-bottom: 1.25rem; }
+
+.form-label {
+  display: block;
+  font-family: var(--font-display);
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 0.5rem;
+}
+
+.form-input,
+.form-select,
+.form-textarea {
+  width: 100%;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 0.75rem 1rem;
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 0.9rem;
+  transition: border-color 0.2s;
+  outline: none;
+}
+.form-input:focus,
+.form-select:focus,
+.form-textarea:focus   { border-color: var(--orange); }
+.form-select           { appearance: none; }
+.form-textarea         { resize: none; height: 100px; }
+.form-input::placeholder,
+.form-textarea::placeholder { color: var(--muted); }
+
+.emergency-box {
+  background: rgba(239,68,68,0.08);
+  border: 1px solid rgba(239,68,68,0.25);
+  border-radius: 12px;
+  padding: 1rem 1.25rem;
+  margin-bottom: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+.emergency-box svg  { width: 22px; height: 22px; stroke: var(--red); flex-shrink: 0; }
+.emergency-text     { font-size: 0.8rem; color: var(--text); line-height: 1.5; }
+.emergency-text strong { color: var(--red); }
+
+
+/* ----------------------------------------------------------
+   15. SETTINGS
+   ---------------------------------------------------------- */
+.settings-section { margin-bottom: 1.5rem; }
+
+.settings-title {
+  font-family: var(--font-display);
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 0.5rem;
+  padding: 0 0.25rem;
+}
+
+.settings-list {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.settings-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.9rem 1.25rem;
+  border-bottom: 1px solid var(--border);
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.settings-item:last-child { border-bottom: none; }
+.settings-item:hover      { background: var(--surface2); }
+
+.settings-left { display: flex; align-items: center; gap: 0.75rem; }
+
+.settings-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  background: var(--surface2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.settings-icon svg { width: 16px; height: 16px; stroke: var(--orange); }
+
+.settings-name { font-size: 0.9rem; font-weight: 500; }
+.settings-desc { font-size: 0.75rem; color: var(--muted); margin-top: 0.1rem; }
+.settings-right svg { width: 16px; height: 16px; stroke: var(--muted); }
+
+/* Toggle switch */
+.toggle { position: relative; width: 40px; height: 22px; }
+.toggle input { opacity: 0; width: 0; height: 0; }
+
+.toggle-slider {
+  position: absolute;
+  inset: 0;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.toggle-slider::before {
+  content: '';
+  position: absolute;
+  width: 16px;
+  height: 16px;
+  left: 2px;
+  top: 2px;
+  background: var(--muted);
+  border-radius: 50%;
+  transition: all 0.2s;
+}
+.toggle input:checked + .toggle-slider               { background: var(--orange); border-color: var(--orange); }
+.toggle input:checked + .toggle-slider::before       { transform: translateX(18px); background: white; }
+
+
+/* ----------------------------------------------------------
+   16. MODAL
+   ---------------------------------------------------------- */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.75);
+  backdrop-filter: blur(4px);
+  z-index: 200;
+  display: none;
+  align-items: flex-end;
+  justify-content: center;
+}
+.modal-overlay.open { display: flex; }
+
+.modal {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 20px 20px 0 0;
+  padding: 1.5rem;
+  width: 100%;
+  max-width: 480px;
+  animation: slideUp 0.3s ease;
+}
+@keyframes slideUp {
+  from { transform: translateY(100%); }
+  to   { transform: translateY(0);    }
+}
+
+.modal-handle {
+  width: 36px;
+  height: 4px;
+  background: var(--border);
+  border-radius: 2px;
+  margin: 0 auto 1.5rem;
+}
+.modal-title {
+  font-family: var(--font-display);
+  font-size: 1.4rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  margin-bottom: 1.25rem;
+}
+
+
+/* ----------------------------------------------------------
+   17. DEVICE PAIRING / SCANNING
+   ---------------------------------------------------------- */
+.pair-steps {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-bottom: 1.25rem;
+}
+
+.pair-step {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 0.75rem 1rem;
+}
+
+.step-num {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--orange);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 0.85rem;
+  flex-shrink: 0;
+}
+.step-text { font-size: 0.85rem; color: var(--muted); }
+
+/* Animated scanning rings */
+.scanning-ring {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  border: 2px solid var(--orange);
+  margin: 1rem auto;
+  position: relative;
+  animation: scanPulse 1.5s ease-in-out infinite;
+}
+.scanning-ring::before,
+.scanning-ring::after {
+  content: '';
+  position: absolute;
+  border-radius: 50%;
+  border: 1.5px solid var(--orange);
+  animation: scanPulse 1.5s ease-in-out infinite;
+}
+.scanning-ring::before { inset: -12px; opacity: 0.5;  animation-delay: 0.3s; }
+.scanning-ring::after  { inset: -24px; opacity: 0.25; animation-delay: 0.6s; }
+
+@keyframes scanPulse {
+  0%, 100% { transform: scale(1);    opacity: 1;   }
+  50%       { transform: scale(1.05); opacity: 0.7; }
+}
+
+.scanning-inner {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.scanning-inner svg { width: 32px; height: 32px; stroke: var(--orange); }
+
+
+/* ----------------------------------------------------------
+   PROFILE CARD (Settings tab)
+   ---------------------------------------------------------- */
+.profile-card {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 1rem 1.25rem;
+  margin-bottom: 1.5rem;
+  position: relative;
+  overflow: hidden;
+}
+.profile-card::before {
+  content: '';
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  width: 4px;
+  background: var(--orange);
+  border-radius: 4px 0 0 4px;
+}
+
+.profile-avatar {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: var(--orange);
+  color: #fff;
+  font-family: var(--font-display);
+  font-size: 1.4rem;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  box-shadow: 0 0 16px rgba(249,115,22,0.4);
+}
+
+.profile-info { flex: 1; min-width: 0; }
+
+.profile-name {
+  font-weight: 700;
+  font-size: 1rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.profile-email {
+  font-size: 0.78rem;
+  color: var(--muted);
+  margin-top: 0.15rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.profile-badge {
+  background: rgba(34,197,94,0.15);
+  color: var(--green);
+  font-family: var(--font-display);
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 0.2rem 0.6rem;
+  border-radius: 20px;
+  flex-shrink: 0;
+}
+
+
+/* ----------------------------------------------------------
+   EMPTY STATE
+   Shown when bags list or alerts list has no items yet.
+   ---------------------------------------------------------- */
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2.5rem 1rem;
+  text-align: center;
+  gap: 0.5rem;
+}
+.empty-icon  { font-size: 2.5rem; margin-bottom: 0.25rem; }
+.empty-title { font-weight: 600; font-size: 0.95rem; }
+.empty-sub   { font-size: 0.8rem; color: var(--muted); line-height: 1.5; max-width: 240px; }
+
+/* Fix settings items so they never overflow or wrap weirdly */
+.settings-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.9rem 1.25rem;
+  border-bottom: 1px solid var(--border);
+  cursor: pointer;
+  transition: background 0.2s;
+  gap: 0.75rem;
+}
+.settings-left {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex: 1;
+  min-width: 0;
+}
+.settings-name { font-size: 0.9rem; font-weight: 500; white-space: nowrap; }
+.settings-desc { font-size: 0.75rem; color: var(--muted); margin-top: 0.1rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }

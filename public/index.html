@@ -1,0 +1,600 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BagWatch — Keep Your Luggage Safe</title>
+
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800&family=Barlow:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+  <!-- App Styles -->
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<!-- ============================================================
+     SCREEN 1: SPLASH
+     First screen users see when they open the app.
+     ============================================================ -->
+<div id="splash" class="screen active">
+  <div class="logo-mark">
+    <svg viewBox="0 0 44 44" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <rect x="6" y="14" width="32" height="22" rx="4" stroke="#f97316" stroke-width="2.5"/>
+      <path d="M15 14V10C15 8.9 15.9 8 17 8H27C28.1 8 29 8.9 29 10V14" stroke="#f97316" stroke-width="2.5"/>
+      <circle cx="22" cy="25" r="5" stroke="#f97316" stroke-width="2.5"/>
+      <path d="M22 22V25L24 27" stroke="#f97316" stroke-width="2" stroke-linecap="round"/>
+    </svg>
+  </div>
+
+  <div class="brand">BAG<span>WATCH</span></div>
+  <div class="tagline">Your luggage. Always with you.</div>
+
+  <div class="splash-cta">
+    <button class="btn btn-primary" onclick="openAuthDrawer('signupDrawer')">Get Started — Free</button>
+    <button class="btn btn-secondary" onclick="openAuthDrawer('signinDrawer')">Sign In</button>
+  </div>
+
+  <p class="splash-note">Free for all South Africans. Built to protect what matters most.</p>
+</div>
+
+
+<!-- ============================================================
+     DRAWER: SIGN IN
+     Slides up over the splash screen when "Sign In" is tapped.
+     ============================================================ -->
+<div class="auth-drawer-overlay" id="signinDrawer">
+  <div class="auth-drawer" onclick="event.stopPropagation()">
+    <div class="drawer-handle"></div>
+
+    <div class="drawer-header">
+      <div class="drawer-title">Welcome back 👋</div>
+      <button class="drawer-close" onclick="closeAuthDrawer('signinDrawer')">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round">
+          <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+        </svg>
+      </button>
+    </div>
+    <p class="drawer-sub">Sign in to monitor your bags and stay protected.</p>
+
+    <div class="auth-error" id="signin-error"></div>
+
+    <!-- Email -->
+    <div class="input-wrap">
+      <svg class="input-icon" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+        <polyline points="22,6 12,13 2,6"/>
+      </svg>
+      <input type="email" id="signin-email" placeholder="Email address" autocomplete="email">
+    </div>
+
+    <!-- Password -->
+    <div class="input-wrap" style="margin-top:0.75rem">
+      <svg class="input-icon" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+        <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+      </svg>
+      <input type="password" id="signin-password" placeholder="Password" autocomplete="current-password">
+      <button class="input-eye" onclick="togglePw('signin-password', this)">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+          <circle cx="12" cy="12" r="3"/>
+        </svg>
+      </button>
+    </div>
+
+    <button class="auth-forgot" style="margin: 0.5rem 0 1rem; display:block; text-align:right;">Forgot password?</button>
+
+    <button class="btn btn-primary" style="width:100%" id="signin-btn" onclick="doSignIn()">Sign In</button>
+
+    <div class="auth-divider" style="margin: 1rem 0;">or</div>
+
+    <button class="btn btn-secondary" style="width:100%" onclick="doGuestLogin()">Continue as Guest</button>
+
+    <div class="auth-switch" style="margin-top:1.25rem">
+      Don't have an account?
+      <button onclick="switchAuthDrawer('signinDrawer','signupDrawer')">Sign Up — it's free</button>
+    </div>
+  </div>
+</div>
+
+
+<!-- ============================================================
+     DRAWER: SIGN UP
+     Slides up over the splash screen when "Get Started" is tapped.
+     ============================================================ -->
+<div class="auth-drawer-overlay" id="signupDrawer">
+  <div class="auth-drawer" onclick="event.stopPropagation()">
+    <div class="drawer-handle"></div>
+
+    <div class="drawer-header">
+      <div class="drawer-title">Create account 🇿🇦</div>
+      <button class="drawer-close" onclick="closeAuthDrawer('signupDrawer')">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round">
+          <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+        </svg>
+      </button>
+    </div>
+    <p class="drawer-sub">Free forever. Built for every South African. 🔒</p>
+
+    <div class="auth-error" id="signup-error"></div>
+
+    <!-- Full Name -->
+    <div class="input-wrap">
+      <svg class="input-icon" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+        <circle cx="12" cy="7" r="4"/>
+      </svg>
+      <input type="text" id="signup-name" placeholder="Full name" oninput="liveValidateName(this)">
+    </div>
+
+    <!-- Email -->
+    <div class="input-wrap" style="margin-top:0.75rem">
+      <svg class="input-icon" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+        <polyline points="22,6 12,13 2,6"/>
+      </svg>
+      <input type="email" id="signup-email" placeholder="Email address" oninput="liveValidateEmail(this)">
+    </div>
+
+    <!-- Password -->
+    <div class="input-wrap" style="margin-top:0.75rem">
+      <svg class="input-icon" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+        <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+      </svg>
+      <input type="password" id="signup-password" placeholder="Create a password (min 6 characters)" oninput="liveValidatePassword(this)">
+      <button class="input-eye" onclick="togglePw('signup-password', this)">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+          <circle cx="12" cy="12" r="3"/>
+        </svg>
+      </button>
+    </div>
+
+    <!-- Password strength bar -->
+    <div id="strength-bar-wrap" style="display:none; margin-top:0.4rem; margin-bottom:0.25rem;">
+      <div style="height:4px; background:var(--border); border-radius:2px; overflow:hidden;">
+        <div id="strength-bar" style="height:100%; width:0%; border-radius:2px; transition:all 0.3s;"></div>
+      </div>
+      <div id="strength-label" style="font-size:0.7rem; color:var(--muted); margin-top:0.25rem;"></div>
+    </div>
+
+    <button class="btn btn-primary" style="width:100%; margin-top:1rem" id="signup-btn" onclick="doSignUp()">
+      Create My Account
+    </button>
+
+    <div class="auth-switch" style="margin-top:1.25rem">
+      Already have an account?
+      <button onclick="switchAuthDrawer('signupDrawer','signinDrawer')">Sign In</button>
+    </div>
+  </div>
+</div>
+
+
+<!-- ============================================================
+     SCREEN 4: MAIN APP
+     ============================================================ -->
+<div id="app" class="screen">
+
+  <!-- Fixed header -->
+  <header class="app-header">
+    <div class="header-brand">BAG<span>WATCH</span></div>
+    <div class="header-right">
+      <!-- Add device shortcut -->
+      <div class="icon-btn" onclick="openModal('addModal')">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10"/>
+          <line x1="12" y1="8" x2="12" y2="16"/>
+          <line x1="8" y1="12" x2="16" y2="12"/>
+        </svg>
+      </div>
+      <!-- Notifications -->
+      <div class="icon-btn">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+          <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+        </svg>
+      </div>
+    </div>
+  </header>
+
+  <!-- ── TAB: HOME ── -->
+  <div id="tab-home" class="content">
+    <div class="page-title" id="home-greeting">My Bags</div>
+    <div class="page-subtitle">All devices are being monitored</div>
+
+    <!-- Overall status banner -->
+    <div class="status-banner" id="statusBanner">
+      <div class="status-dot" id="statusDot"></div>
+      <div class="status-text">
+        <div class="status-title" id="statusTitle">All bags safe</div>
+        <div class="status-sub"  id="statusSub">Bluetooth active · 3 devices connected</div>
+      </div>
+    </div>
+
+    <div class="section-label">Your Devices</div>
+
+    <!-- Bags are rendered here by renderBags() in app.js -->
+    <div class="bags-grid" id="bags-grid">
+      <!-- Empty state shown when no bags added yet -->
+      <div class="empty-state" id="empty-bags">
+        <div class="empty-icon">🎒</div>
+        <div class="empty-title">No bags added yet</div>
+        <div class="empty-sub">Tap "Add New Device" below to pair your first BagWatch tracker</div>
+      </div>
+    </div>
+
+    <!-- Add new device button -->
+    <button class="add-bag-btn" onclick="openModal('addModal')">
+      <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="10"/>
+        <line x1="12" y1="8" x2="12" y2="16"/>
+        <line x1="8" y1="12" x2="16" y2="12"/>
+      </svg>
+      Add New Device
+    </button>
+
+    <!-- Community network section -->
+    <div class="section-label" style="margin-top:1.5rem">Community Network</div>
+    <div class="community-box">
+      <div class="community-header">
+        <div>
+          <div class="community-title">Helpers Nearby</div>
+          <div class="community-sub">Anonymous BagWatch users relaying your signal</div>
+        </div>
+        <div>
+          <div class="community-count">23</div>
+          <div class="community-sub" style="text-align:right">active</div>
+        </div>
+      </div>
+
+      <!-- Animated radar -->
+      <div class="radar">
+        <div class="radar-ring"></div>
+        <div class="radar-ring"></div>
+        <div class="radar-ring"></div>
+        <div class="radar-sweep"></div>
+        <div class="radar-dot" style="top:30%; left:60%;"></div>
+        <div class="radar-dot" style="top:55%; left:25%; background:var(--yellow); box-shadow:0 0 6px var(--yellow);"></div>
+        <div class="radar-dot" style="top:70%; left:65%;"></div>
+        <div class="radar-center"></div>
+      </div>
+
+      <p style="font-size:0.75rem; color:var(--muted); text-align:center; margin-top:0.5rem">
+        🔒 No personal data is ever shared
+      </p>
+    </div>
+  </div><!-- end tab-home -->
+
+
+  <!-- ── TAB: ALERTS ── -->
+  <div id="tab-alerts" class="content" style="display:none">
+    <div class="page-title">Alerts</div>
+    <div class="page-subtitle">Recent activity on your devices</div>
+
+    <!-- Alerts rendered by renderAlerts() in app.js -->
+    <div id="alerts-list">
+      <div class="empty-state">
+        <div class="empty-icon">🔔</div>
+        <div class="empty-title">No alerts yet</div>
+        <div class="empty-sub">You'll be notified here when a bag moves or loses signal</div>
+      </div>
+    </div>
+  </div><!-- end tab-alerts -->
+
+
+  <!-- ── TAB: REPORT ── -->
+  <div id="tab-report" class="content" style="display:none">
+    <div class="page-title">Report Theft</div>
+    <div class="page-subtitle">Help us help you recover your bag</div>
+
+    <!-- Emergency numbers -->
+    <div class="emergency-box">
+      <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+        <line x1="12" y1="9" x2="12" y2="13"/>
+        <line x1="12" y1="17" x2="12.01" y2="17"/>
+      </svg>
+      <div class="emergency-text">
+        In immediate danger? <strong>Call 10111 (SAPS)</strong> or <strong>10177 (Emergency)</strong>.
+        Do not approach a suspected thief alone.
+      </div>
+    </div>
+
+    <!-- Report form -->
+    <div class="form-group">
+      <label class="form-label">Which bag was stolen?</label>
+      <select class="form-select">
+        <option>Handbag (BW-003)</option>
+        <option>Main Backpack (BW-001)</option>
+        <option>Big Suitcase (BW-002)</option>
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Bus / Route</label>
+      <input class="form-input" type="text" placeholder="e.g. Intercape · JHB–DBN, or Taxi Route 14">
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Time of incident</label>
+      <input class="form-input" type="time" value="14:32">
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Last known location</label>
+      <input class="form-input" type="text" value="Bree St Taxi Rank — auto-detected">
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Description</label>
+      <textarea class="form-textarea" placeholder="Describe the bag, contents, or any suspects if safe to do so..."></textarea>
+    </div>
+
+    <button class="btn btn-primary" style="width:100%; margin-bottom:0.75rem" onclick="submitReport()">
+      Submit Report
+    </button>
+    <p style="font-size:0.73rem; color:var(--muted); text-align:center">
+      Your report is shared with SAPS and community monitors in your area
+    </p>
+  </div><!-- end tab-report -->
+
+
+  <!-- ── TAB: SETTINGS ── -->
+  <div id="tab-settings" class="content" style="display:none">
+    <div class="page-title">Settings</div>
+
+    <!-- Profile Card — updated dynamically on sign in / sign up -->
+    <div class="profile-card">
+      <div class="profile-avatar" id="profile-avatar">?</div>
+      <div class="profile-info">
+        <div class="profile-name" id="profile-name">Guest User</div>
+        <div class="profile-email" id="profile-email">Not signed in</div>
+      </div>
+      <div class="profile-badge">Active</div>
+    </div>
+
+    <!-- Tracking settings -->
+    <div class="settings-section">
+      <div class="settings-title">Tracking</div>
+      <div class="settings-list">
+
+        <div class="settings-item">
+          <div class="settings-left">
+            <div class="settings-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="3"/>
+                <path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 4.93a10 10 0 0 0 0 14.14M12 2v2M12 20v2M2 12h2M20 12h2"/>
+              </svg>
+            </div>
+            <div>
+              <div class="settings-name">Bluetooth Scanning</div>
+              <div class="settings-desc">Always scan in background</div>
+            </div>
+          </div>
+          <label class="toggle">
+            <input type="checkbox" checked>
+            <span class="toggle-slider"></span>
+          </label>
+        </div>
+
+        <div class="settings-item">
+          <div class="settings-left">
+            <div class="settings-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+                <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+              </svg>
+            </div>
+            <div>
+              <div class="settings-name">Instant Alerts</div>
+              <div class="settings-desc">Vibrate + sound when bag leaves range</div>
+            </div>
+          </div>
+          <label class="toggle">
+            <input type="checkbox" checked>
+            <span class="toggle-slider"></span>
+          </label>
+        </div>
+
+        <div class="settings-item">
+          <div class="settings-left">
+            <div class="settings-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10"/>
+                <path d="M12 8v4l3 3"/>
+              </svg>
+            </div>
+            <div>
+              <div class="settings-name">Alert Sensitivity</div>
+              <div class="settings-desc">Trigger at 10m distance</div>
+            </div>
+          </div>
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="9 18 15 12 9 6"/>
+          </svg>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Community settings -->
+    <div class="settings-section">
+      <div class="settings-title">Community</div>
+      <div class="settings-list">
+        <div class="settings-item">
+          <div class="settings-left">
+            <div class="settings-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+                <circle cx="9" cy="7" r="4"/>
+                <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+                <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+              </svg>
+            </div>
+            <div>
+              <div class="settings-name">Help Others</div>
+              <div class="settings-desc">Be an anonymous relay for the network</div>
+            </div>
+          </div>
+          <label class="toggle">
+            <input type="checkbox" checked>
+            <span class="toggle-slider"></span>
+          </label>
+        </div>
+      </div>
+    </div>
+
+    <!-- Account settings -->
+    <div class="settings-section">
+      <div class="settings-title">Account</div>
+      <div class="settings-list">
+        <div class="settings-item" onclick="goScreen('splash')">
+          <div class="settings-left">
+            <div class="settings-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+                <polyline points="16 17 21 12 16 7"/>
+                <line x1="21" y1="12" x2="9" y2="12"/>
+              </svg>
+            </div>
+            <div><div class="settings-name">Sign Out</div></div>
+          </div>
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="9 18 15 12 9 6"/>
+          </svg>
+        </div>
+      </div>
+    </div>
+
+    <p style="text-align:center; font-size:0.72rem; color:var(--muted); margin-top:1rem">
+      BagWatch v1.0 · Made in South Africa 🇿🇦<br>Free forever for all South Africans
+    </p>
+  </div><!-- end tab-settings -->
+
+
+  <!-- Fixed bottom navigation -->
+  <nav class="bottom-nav">
+    <button class="nav-item active" onclick="switchTab('home')" id="nav-home">
+      <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+        <polyline points="9 22 9 12 15 12 15 22"/>
+      </svg>
+      <span class="nav-label">Home</span>
+    </button>
+    <button class="nav-item" onclick="switchTab('alerts')" id="nav-alerts">
+      <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+        <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+      </svg>
+      <span class="nav-label">Alerts</span>
+    </button>
+    <button class="nav-item" onclick="switchTab('report')" id="nav-report">
+      <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+      </svg>
+      <span class="nav-label">Report</span>
+    </button>
+    <button class="nav-item" onclick="switchTab('settings')" id="nav-settings">
+      <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="3"/>
+        <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+      </svg>
+      <span class="nav-label">Settings</span>
+    </button>
+  </nav>
+
+</div><!-- end #app -->
+
+
+<!-- ============================================================
+     MODAL: ADD DEVICE
+     ============================================================ -->
+<div class="modal-overlay" id="addModal" onclick="closeModalOutside(event, 'addModal')">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-title">Add New Device</div>
+
+    <div class="pair-steps">
+      <div class="pair-step">
+        <div class="step-num">1</div>
+        <div class="step-text">Get a BagWatch tracker (R89 at Checkers, Game, or online)</div>
+      </div>
+      <div class="pair-step">
+        <div class="step-num">2</div>
+        <div class="step-text">Press the button on the tracker for 3 seconds until it flashes orange</div>
+      </div>
+      <div class="pair-step">
+        <div class="step-num">3</div>
+        <div class="step-text">Tap "Scan for Device" below and bring your phone close</div>
+      </div>
+    </div>
+
+    <div style="text-align:center; margin: 0.5rem 0 1.25rem;">
+      <div class="scanning-ring" id="scanRing" style="display:none">
+        <div class="scanning-inner">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M6.3 20.3a8 8 0 0 0 11.4 0M4.2 17.1a11 11 0 0 0 15.6 0M2 13.5a14 14 0 0 0 20 0M9 12l2 2 4-4"/>
+          </svg>
+        </div>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Bag Nickname</label>
+      <input class="form-input" type="text" placeholder="e.g. School Bag, Weekend Bag">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Bag Type</label>
+      <select class="form-select">
+        <option>🎒 Backpack</option>
+        <option>🧳 Suitcase</option>
+        <option>👜 Handbag</option>
+        <option>💼 Briefcase</option>
+        <option>🛍️ Shopping Bag</option>
+      </select>
+    </div>
+
+    <button class="btn btn-primary" style="width:100%; margin-bottom:0.75rem" onclick="startScan()">
+      Scan for Device
+    </button>
+    <button class="btn btn-secondary" style="width:100%" onclick="closeModal('addModal')">
+      Cancel
+    </button>
+  </div>
+</div>
+
+
+<!-- ============================================================
+     MODAL: THEFT ALERT
+     ============================================================ -->
+<div class="modal-overlay" id="alertModal" onclick="closeModalOutside(event, 'alertModal')">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div style="text-align:center; margin-bottom:1rem;">
+      <div style="font-size:3rem; margin-bottom:0.5rem;">🚨</div>
+      <div class="modal-title" style="color:var(--red)">BAG SIGNAL LOST!</div>
+      <p style="font-size:0.85rem; color:var(--muted); line-height:1.5;">
+        Your <strong style="color:var(--text)">Handbag</strong> lost connection 14 minutes ago
+        near <strong style="color:var(--text)">Bree Street Taxi Rank</strong>.
+      </p>
+    </div>
+    <div style="display:flex; flex-direction:column; gap:0.75rem;">
+      <button class="btn btn-primary" style="width:100%; background:var(--red)"
+              onclick="closeModal('alertModal'); switchTab('report')">
+        Report Theft Now
+      </button>
+      <button class="btn btn-secondary" style="width:100%" onclick="closeModal('alertModal')">
+        It's Fine — I Have It
+      </button>
+    </div>
+  </div>
+
+</div>
+</div><!-- end alertModal -->
+
+<!-- Load app logic LAST so all HTML elements exist first -->
+<script src="app.js"></script>
+</body>
+</html>
