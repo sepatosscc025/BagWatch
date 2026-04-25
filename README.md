@@ -1,7 +1,7 @@
 # BagWatch
 **Affordable Bluetooth luggage tracking for South African bus commuters.**
 
-> Built from personal experience. My belongings were stolen on an Intercity Xpress bus. Like hundreds of South Africans every week, I reported it and got nothing back. No tracking. No alerts. No recourse. Most people move on. I decided to build a solution instead.
+> Built from personal experience. My belongings were stolen on a long-distance bus. Like hundreds of South Africans every week, I reported it and got nothing back. No tracking. No alerts. No recourse. Most people move on. I decided to build a solution instead.
 
 ![Status](https://img.shields.io/badge/status-active%20development-orange)
 ![Stack](https://img.shields.io/badge/stack-HTML%20%7C%20CSS%20%7C%20JS%20%7C%20Node.js-blue)
